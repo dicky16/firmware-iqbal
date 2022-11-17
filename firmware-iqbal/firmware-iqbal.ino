@@ -11,12 +11,15 @@ int servoON = 90;
 int servoOFF = 0;
 int servoStatus = false;
 
+/* Relay */
+int WATER_VALVE = D4;
+
 /* WiFi */
 const char* ssid = "kandang";
 const char* password = "1234567890";
 
 /* DHT Sensor */
-#define DHTPIN 5
+#define DHTPIN D5
 #define DHTTYPE    DHT11
 DHT dht(DHTPIN, DHTTYPE);
 float t = 0.0;
@@ -27,13 +30,14 @@ unsigned long mSensor = 0;
 #define SOIL A0
 float soilValue;
 #define SERVO D0
+bool s = false;
 
 /* PH Sensor */
 #define PH_PIN D4
 float PH;
 
 /* MQTT */
-String MQTT_HOST = "mqtt://devmyeco.my.id";
+String MQTT_HOST = "devmyeco.my.id";
 int MQTT_PORT = 1884;
 String MQTT_USERNAME = "client";
 String MQTT_PASSWORD = "client";
@@ -77,10 +81,11 @@ void setup() {
   dht.begin();
 
   /* Servo Setup */
-  servo.attach(SERVO);
+  // servo.attach(SERVO);
 
   /* PH Setup */
   pinMode(PH_PIN, INPUT);
+  pinMode(WATER_VALVE, OUTPUT);
 
   /* Connect WiFi */
   WiFi.begin(ssid, password);
@@ -129,6 +134,8 @@ void loop() {
     Serial.println(t);
     Serial.print("Humd : ");
     Serial.println(h);
+    Serial.print("Soil Moisture Value : ");
+    Serial.println(soil);
     Serial.print("Soil Moisture : ");
     Serial.println(soilValue);
     mSensor = millis();
@@ -143,11 +150,11 @@ void loop() {
     mPublish = millis();
   }
 
-  if(soilValue <= 70) {
-    servo.write(servoON);
+  if(soilValue <= 50) {
+    digitalWrite(WATER_VALVE, 0);
     servoStatus = true;
   } else {
-    servo.write(servoOFF);
+    digitalWrite(WATER_VALVE, 1);
     servoStatus = false;
   }
 
