@@ -4,6 +4,7 @@
 #include <DHT.h>
 #include <PubSubClient.h>
 #include <Servo.h>
+#include <ArduinoJson.h>
 
 /* Servo */
 Servo servo;
@@ -141,12 +142,22 @@ void loop() {
     mSensor = millis();
   }
 
-  if(millis() - mPublish > 700) {
-    mqtt.publish(topicServoStatus.c_str(), String(servoStatus).c_str());
-    mqtt.publish(topicTemp.c_str(), String(t).c_str());
-    mqtt.publish(topicHum.c_str(), String(h).c_str());
-    mqtt.publish(topicSoil.c_str(), String(soilValue).c_str());
-    mqtt.publish(topicPH.c_str(), String(PH).c_str());
+  if(millis() - mPublish > 2000) {
+    // mqtt.publish(topicServoStatus.c_str(), String(servoStatus).c_str());
+    // mqtt.publish(topicTemp.c_str(), String(t).c_str());
+    // mqtt.publish(topicHum.c_str(), String(h).c_str());
+    // mqtt.publish(topicSoil.c_str(), String(soilValue).c_str());
+    // mqtt.publish(topicPH.c_str(), String(PH).c_str());
+    char output[64];
+    StaticJsonDocument<64> doc;
+
+    doc["temperature"] = t;
+    doc["humidity"] = h;
+    doc["soil_moisture"] = soilValue;
+    doc["id_wilayah"] = 1;
+
+    serializeJson(doc, output);
+
     mPublish = millis();
   }
 
